@@ -12,7 +12,7 @@ import numpy as np
 
 # --- 1. CONFIGURACIÓN ---
 st.set_page_config(page_title="AXIOM PRO", page_icon="📈", layout="wide")
-st.set_page_config(page_title="AXIOM PRO", page_icon="📈", layout="wide")
+
 
 # OCULTAR MENÚS DE STREAMLIT
 st.markdown("""
