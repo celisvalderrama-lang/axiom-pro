@@ -12,7 +12,17 @@ import numpy as np
 
 # --- 1. CONFIGURACIÓN ---
 st.set_page_config(page_title="AXIOM PRO", page_icon="📈", layout="wide")
+st.set_page_config(page_title="AXIOM PRO", page_icon="📈", layout="wide")
 
+# OCULTAR MENÚS DE STREAMLIT
+st.markdown("""
+    <style>
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+    [data-testid="stToolbar"] {visibility: hidden;}
+    </style>
+    """, unsafe_allow_html=True)
 # --- 2. ESTILO CSS ---
 st.markdown("""
     <style>
