@@ -11,7 +11,7 @@ import xml.etree.ElementTree as ET
 import numpy as np
 
 # --- 1. CONFIGURACIÓN ---
-st.set_page_config(page_title="AXIOM AI TERMINAL", layout="wide", initial_sidebar_state="expanded", page_icon="app_icon.png")
+st.set_page_config(page_title="AXIOM PRO", page_icon="📈", layout="wide")
 
 # --- 2. ESTILO CSS ---
 st.markdown("""
