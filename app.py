@@ -8,21 +8,21 @@ import urllib.request
 import urllib.parse
 import xml.etree.ElementTree as ET
 
-# --- 1. CONFIGURACIÓN (MÓVIL-FIRST) ---
-st.set_page_config(page_title="AXIOM PRO", page_icon="📈", layout="wide", initial_sidebar_state="collapsed")
+# --- 1. CONFIGURACIÓN (MENÚ ABIERTO POR DEFECTO PARA VER CONTROLES) ---
+st.set_page_config(page_title="AXIOM PRO", page_icon="📈", layout="wide", initial_sidebar_state="expanded")
 
 # --- 2. ESTILO CSS (UX/UI MÓVIL Y PROFESIONAL) ---
 st.markdown("""
     <style>
-    #MainMenu {visibility: hidden;} footer {visibility: hidden;} header {visibility: hidden;}
-    .block-container { padding-top: 1rem !important; padding-bottom: 1rem !important; }
+    #MainMenu {visibility: hidden;} 
+    footer {visibility: hidden;} 
+    
+    .block-container { padding-top: 2rem !important; padding-bottom: 1rem !important; }
     .stApp { background-color: #030305; color: #ffffff; }
     [data-testid="stSidebar"] { background-color: #08080c; border-right: 1px solid #C5A059; }
     
-    /* Fuentes legibles en móvil */
     p, span, label, h1, h2, h3, h4, h5 { font-family: sans-serif; }
     
-    /* Botones táctiles anchos */
     div.stButton > button {
         background: linear-gradient(45deg, #C5A059, #FFD700) !important;
         color: black !important; font-weight: 800 !important;
@@ -30,7 +30,6 @@ st.markdown("""
         border-radius: 10px !important; font-size: 18px !important; border: none !important;
     }
 
-    /* Tarjetas de Cabecera (Grid 2x2 para móvil) */
     .price-card {
         padding: 12px; border-radius: 8px; border: 1px solid #1e1e26;
         background: #0d0d12; margin-bottom: 10px; text-align: center;
@@ -38,7 +37,6 @@ st.markdown("""
     .up { color: #00ff88; font-weight: bold; font-size: 18px;}
     .down { color: #ff4b4b; font-weight: bold; font-size: 18px;}
 
-    /* Señal IA Profesional */
     .ai-signal-pro {
         padding: 20px; border-radius: 12px; border: 2px solid #C5A059;
         background: linear-gradient(180deg, #0a0a1a 0%, #050508 100%);
@@ -49,7 +47,6 @@ st.markdown("""
         border-radius: 6px; border-left: 3px solid #C5A059; font-size: 0.9em; text-align: left; margin-top: 10px;
     }
     
-    /* Textos de Academia */
     .acad-text { background: #11111d; padding: 20px; border-radius: 10px; border-left: 4px solid #C5A059; line-height: 1.6; margin-bottom: 15px; }
     .step-highlight { color: #C5A059; font-weight: bold; }
     .news-box { background: #161b22; padding: 12px; border-radius: 8px; border-left: 4px solid #C5A059; margin-bottom: 10px; font-size: 0.9em; }
@@ -87,27 +84,25 @@ with st.sidebar:
     risk_pct = st.slider("⚠️ RIESGO POR OPERACIÓN (%)", 0.5, 5.0, 2.0)
     st.markdown("---")
     
-    # LISTA EXACTA DE ACTIVOS ORIGINAL
-    cat = st.selectbox("📂 MERCADO", ["💱 Divisas", "🪙 Criptomonedas", "📈 Índices", "🛢️ Materias Primas", "🏢 Acciones"])
+    cat = st.selectbox("📂 MERCADO", ["💱 Divisas (Forex)", "🏢 Acciones", "📈 Índices", "🪙 Criptomonedas", "🛢️ Materias Primas"])
     
-    if "Divisas" in cat: opciones = {"EUR/USD": "EURUSD=X", "GBP/USD": "GBPUSD=X", "USD/JPY": "JPY=X"}
-    elif "Cripto" in cat: opciones = {"Bitcoin": "BTC-USD", "Ethereum": "ETH-USD", "Solana": "SOL-USD"}
-    elif "Índices" in cat: opciones = {"S&P 500": "^GSPC", "Nasdaq 100": "^IXIC", "IBEX 35": "^IBEX"}
-    elif "Materias" in cat: opciones = {"Oro": "GC=F", "Plata": "SI=F", "Petróleo": "BZ=F"}
-    else: opciones = {"Tesla": "TSLA", "Nvidia": "NVDA", "Amazon": "AMZN"}
+    if "Divisas" in cat: opciones = {"EUR/USD": "EURUSD=X", "GBP/USD": "GBPUSD=X", "USD/JPY": "JPY=X", "USD/CHF": "USDCHF=X", "AUD/USD": "AUDUSD=X", "USD/CAD": "CAD=X"}
+    elif "Acciones" in cat: opciones = {"Tesla": "TSLA", "Nvidia": "NVDA", "Amazon": "AMZN", "Google": "GOOGL", "Apple": "AAPL", "Meta": "META", "Netflix": "NFLX", "Microsoft": "MSFT"}
+    elif "Índices" in cat: opciones = {"S&P 500": "^GSPC", "Nasdaq 100": "^IXIC", "Dow Jones": "^DJI", "IBEX 35": "^IBEX", "DAX 40": "^GDAXI"}
+    elif "Cripto" in cat: opciones = {"Bitcoin": "BTC-USD", "Ethereum": "ETH-USD", "Solana": "SOL-USD", "Cardano": "ADA-USD", "Ripple": "XRP-USD"}
+    else: opciones = {"Oro": "GC=F", "Petróleo": "BZ=F", "Plata": "SI=F", "Gas Natural": "NG=F"}
     
     activo_nombre = st.selectbox("🎯 ACTIVO", list(opciones.keys()))
     ticker = opciones[activo_nombre]
     st.markdown("<br>", unsafe_allow_html=True)
     btn_analizar = st.button("🚀 ANALIZAR MERCADO")
 
-# --- 5. CABECERA DE PRECIOS EN VIVO CON TUS ACTIVOS (MÓVIL GRID 2x2) ---
+# --- 5. CABECERA DE PRECIOS EN VIVO ---
 st.markdown("<h3 style='text-align:center; color:#C5A059;'>⚖️ TERMINAL MÓVIL</h3>", unsafe_allow_html=True)
 c1, c2 = st.columns(2)
-# TUS 4 ACTIVOS ORIGINALES EXACTOS
+
 top_assets = [("BTC-USD", "BITCOIN"), ("SI=F", "PLATA"), ("^GSPC", "S&P 500"), ("BZ=F", "PETRÓLEO")]
 
-# Primera Fila
 for i in range(2):
     t, n = top_assets[i]
     d = yf.Ticker(t).history(period="2d")
@@ -118,7 +113,6 @@ for i in range(2):
         arrow = "▲" if change >= 0 else "▼"
         c1.markdown(f"<div class='price-card'><small>{n}</small><br><b class='{c_class}'>${curr:,.2f}</b><br><small class='{c_class}'>{arrow} {change:,.2f}</small></div>", unsafe_allow_html=True)
 
-# Segunda Fila
 for i in range(2, 4):
     t, n = top_assets[i]
     d = yf.Ticker(t).history(period="2d")
@@ -129,7 +123,7 @@ for i in range(2, 4):
         arrow = "▲" if change >= 0 else "▼"
         c2.markdown(f"<div class='price-card'><small>{n}</small><br><b class='{c_class}'>${curr:,.2f}</b><br><small class='{c_class}'>{arrow} {change:,.2f}</small></div>", unsafe_allow_html=True)
 
-# --- 6. PESTAÑAS ---
+# --- 6. PESTAÑAS (AQUÍ ESTÁ EL ASISTENTE Y LA ACADEMIA) ---
 tab_term, tab_acad, tab_chat = st.tabs(["🖥️ TERMINAL", "🎓 ACADEMIA", "💬 ASISTENTE"])
 
 with tab_term:
@@ -138,14 +132,12 @@ with tab_term:
     if not df.empty:
         if isinstance(df.columns, pd.MultiIndex): df.columns = df.columns.droplevel(1)
         
-        # TUS INDICADORES EXACTOS
         df['SMA20'] = df['Close'].rolling(window=20).mean()
         df['EMA50'] = df['Close'].ewm(span=50, adjust=False).mean()
         df['Recent_High'] = df['High'].rolling(window=20).max()
         df['Recent_Low'] = df['Low'].rolling(window=20).min()
         df.dropna(inplace=True)
         
-        # Gráfico adaptado para móvil con volumen
         fig = make_subplots(rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.03, row_heights=[0.75, 0.25])
         fig.add_trace(go.Candlestick(x=df.index, open=df['Open'], high=df['High'], low=df['Low'], close=df['Close'], name="Precio", increasing_line_color='#00ff88', decreasing_line_color='#ff4b4b'), row=1, col=1)
         fig.add_trace(go.Scatter(x=df.index, y=df['EMA50'], line=dict(color='#C5A059', width=2), name="EMA 50"), row=1, col=1)
@@ -157,7 +149,6 @@ with tab_term:
         st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
 
         if btn_analizar:
-            # TU LÓGICA DE SEÑAL EXACTA Y RAZONAMIENTOS IA
             last_p = float(df['Close'].iloc[-1])
             sma20 = float(df['SMA20'].iloc[-1])
             ema50 = float(df['EMA50'].iloc[-1])
@@ -165,10 +156,10 @@ with tab_term:
             tp_min = float(df['Recent_Low'].iloc[-2])
             
             if last_p > ema50 and last_p > sma20:
-                side, color, tp = "COMPRA (BUY)", "#00ff88", tp_max
-                razon = "Doble confirmación técnica. El precio rompe la SMA20 y se sostiene sobre la EMA50."
+                side, color, tp = "COMPRA (BUY)", "#00ff88", tp_max + (tp_max * 0.001)
+                razon = "Doble confirmación técnica. El precio rompe la SMA20 y se sostiene sobre la EMA50 con volumen comprador."
             elif last_p < ema50 and last_p < sma20:
-                side, color, tp = "VENTA (SELL)", "#ff4b4b", tp_min
+                side, color, tp = "VENTA (SELL)", "#ff4b4b", tp_min - (tp_min * 0.001)
                 razon = "Caída con volumen confirmada. El precio pierde tanto la SMA20 como la EMA50."
             else:
                 side, color, tp = "ESPERAR (NEUTRAL)", "#FFD700", last_p
@@ -179,7 +170,7 @@ with tab_term:
                     <small style='color:#C5A059;'>🤖 SEÑAL AXIOM IA</small>
                     <h2 style='color:{color}; margin:0;'>{side}</h2>
                     <p>Probabilidad de Éxito: <b style='color:#00ff88;'>75.0%</b></p>
-                    <div class='analysis-box'><b>ANÁLISIS DEL MOVIMIENTO:</b><br>{razon}</div>
+                    <div class='analysis-box'><b>ANÁLISIS TÉCNICO:</b><br>{razon}</div>
                     <hr style='border-color:#1e1e26;'>
                     <p style='color:#C5A059; font-weight:bold; margin-bottom:0;'>🎯 TAKE PROFIT SUGERIDO</p>
                     <b style='font-size:32px; color:#ffffff;'>{tp:,.4f}</b>
@@ -189,7 +180,6 @@ with tab_term:
             perdida = balance * (risk_pct / 100)
             st.info(f"🛡️ Ajusta tu lotaje para arriesgar exactamente: **${perdida:,.2f}**")
             
-            # Noticias recuperadas
             st.markdown("<h4 style='color:#C5A059; margin-top:15px;'>📰 Radar de Noticias</h4>", unsafe_allow_html=True)
             titulares_reales = []
             try:
@@ -262,4 +252,4 @@ with tab_chat:
         with st.chat_message("assistant"): st.markdown(respuesta)
         st.session_state.messages.append({"role": "assistant", "content": respuesta})
 
-st.caption(f"Axiom Mobile Terminal v5.1 | {datetime.now().strftime('%H:%M:%S')}")
+st.caption(f"Axiom Mobile Terminal v5.5 | {datetime.now().strftime('%H:%M:%S')}")
