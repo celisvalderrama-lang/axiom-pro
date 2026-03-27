@@ -8,15 +8,13 @@ import urllib.request
 import urllib.parse
 import xml.etree.ElementTree as ET
 
-# --- 1. CONFIGURACIÓN (MENÚ ABIERTO POR DEFECTO PARA VER CONTROLES) ---
+# --- 1. CONFIGURACIÓN ---
 st.set_page_config(page_title="AXIOM PRO", page_icon="📈", layout="wide", initial_sidebar_state="expanded")
 
-# --- 2. ESTILO CSS (UX/UI MÓVIL Y PROFESIONAL) ---
+# --- 2. ESTILO CSS ---
 st.markdown("""
     <style>
-    #MainMenu {visibility: hidden;} 
-    footer {visibility: hidden;} 
-    
+    #MainMenu {visibility: hidden;} footer {visibility: hidden;} 
     .block-container { padding-top: 2rem !important; padding-bottom: 1rem !important; }
     .stApp { background-color: #030305; color: #ffffff; }
     [data-testid="stSidebar"] { background-color: #08080c; border-right: 1px solid #C5A059; }
@@ -31,25 +29,29 @@ st.markdown("""
     }
 
     .price-card {
-        padding: 12px; border-radius: 8px; border: 1px solid #1e1e26;
+        padding: 10px; border-radius: 8px; border: 1px solid #1e1e26;
         background: #0d0d12; margin-bottom: 10px; text-align: center;
     }
-    .up { color: #00ff88; font-weight: bold; font-size: 18px;}
-    .down { color: #ff4b4b; font-weight: bold; font-size: 18px;}
+    .up { color: #00ff88; font-weight: bold; font-size: 16px;}
+    .down { color: #ff4b4b; font-weight: bold; font-size: 16px;}
 
+    /* CAJA DE IA MÁS COMPACTA */
     .ai-signal-pro {
-        padding: 20px; border-radius: 12px; border: 2px solid #C5A059;
+        padding: 15px; border-radius: 10px; border: 1px solid #C5A059;
         background: linear-gradient(180deg, #0a0a1a 0%, #050508 100%);
-        box-shadow: 0 10px 30px rgba(0,0,0,0.5); margin-bottom: 20px; text-align: center;
+        margin-bottom: 15px; text-align: center;
     }
     .analysis-box {
-        background: rgba(197, 160, 89, 0.05); padding: 12px; 
-        border-radius: 6px; border-left: 3px solid #C5A059; font-size: 0.9em; text-align: left; margin-top: 10px;
+        background: rgba(197, 160, 89, 0.05); padding: 10px; 
+        border-radius: 6px; border-left: 3px solid #C5A059; font-size: 0.85em; text-align: left; margin-top: 8px;
+    }
+    .level-box {
+        background: #11111d; padding: 10px; border-radius: 8px; width: 48%; text-align: center;
     }
     
-    .acad-text { background: #11111d; padding: 20px; border-radius: 10px; border-left: 4px solid #C5A059; line-height: 1.6; margin-bottom: 15px; }
-    .step-highlight { color: #C5A059; font-weight: bold; }
-    .news-box { background: #161b22; padding: 12px; border-radius: 8px; border-left: 4px solid #C5A059; margin-bottom: 10px; font-size: 0.9em; }
+    .acad-text { background: #11111d; padding: 15px; border-radius: 10px; border-left: 4px solid #C5A059; line-height: 1.5; margin-bottom: 10px; font-size: 0.9em; }
+    .step-highlight { color: #C5A059; font-weight: bold; font-size: 1.1em; display: block; margin-bottom: 5px; margin-top: 10px;}
+    .news-box { background: #161b22; padding: 10px; border-radius: 8px; border-left: 4px solid #C5A059; margin-bottom: 8px; font-size: 0.85em; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -98,9 +100,8 @@ with st.sidebar:
     btn_analizar = st.button("🚀 ANALIZAR MERCADO")
 
 # --- 5. CABECERA DE PRECIOS EN VIVO ---
-st.markdown("<h3 style='text-align:center; color:#C5A059;'>⚖️ TERMINAL MÓVIL</h3>", unsafe_allow_html=True)
+st.markdown("<h3 style='text-align:center; color:#C5A059; margin-bottom:5px;'>⚖️ TERMINAL MÓVIL</h3>", unsafe_allow_html=True)
 c1, c2 = st.columns(2)
-
 top_assets = [("BTC-USD", "BITCOIN"), ("SI=F", "PLATA"), ("^GSPC", "S&P 500"), ("BZ=F", "PETRÓLEO")]
 
 for i in range(2):
@@ -123,7 +124,7 @@ for i in range(2, 4):
         arrow = "▲" if change >= 0 else "▼"
         c2.markdown(f"<div class='price-card'><small>{n}</small><br><b class='{c_class}'>${curr:,.2f}</b><br><small class='{c_class}'>{arrow} {change:,.2f}</small></div>", unsafe_allow_html=True)
 
-# --- 6. PESTAÑAS (AQUÍ ESTÁ EL ASISTENTE Y LA ACADEMIA) ---
+# --- 6. PESTAÑAS ---
 tab_term, tab_acad, tab_chat = st.tabs(["🖥️ TERMINAL", "🎓 ACADEMIA", "💬 ASISTENTE"])
 
 with tab_term:
@@ -144,9 +145,16 @@ with tab_term:
         v_colors = ['#00ff88' if r['Open'] < r['Close'] else '#ff4b4b' for i, r in df.iterrows()]
         fig.add_trace(go.Bar(x=df.index, y=df['Volume'], marker_color=v_colors), row=2, col=1)
         
-        fig.update_layout(template="plotly_dark", height=450, xaxis_rangeslider_visible=False, margin=dict(l=0,r=0,t=0,b=0), paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
-        fig.update_yaxes(gridcolor='#1e1e26')
-        st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
+        # GRÁFICO BLOQUEADO PARA MÓVIL (No se vuelve loco al tocarlo)
+        fig.update_layout(
+            template="plotly_dark", height=400, xaxis_rangeslider_visible=False, 
+            margin=dict(l=0,r=0,t=0,b=0), paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
+            dragmode=False # Desactiva el arrastre táctil
+        )
+        fig.update_xaxes(fixedrange=True) # Desactiva el zoom en eje X
+        fig.update_yaxes(fixedrange=True) # Desactiva el zoom en eje Y
+        
+        st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False, 'scrollZoom': False})
 
         if btn_analizar:
             last_p = float(df['Close'].iloc[-1])
@@ -162,25 +170,44 @@ with tab_term:
                 side, color, tp = "VENTA (SELL)", "#ff4b4b", tp_min - (tp_min * 0.001)
                 razon = "Caída con volumen confirmada. El precio pierde tanto la SMA20 como la EMA50."
             else:
-                side, color, tp = "ESPERAR (NEUTRAL)", "#FFD700", last_p
+                side, color, tp = "ESPERAR", "#FFD700", None
                 razon = "Falta de confluencia. El precio no tiene dirección clara entre la SMA20 y la EMA50."
 
             st.markdown(f"""
                 <div class='ai-signal-pro'>
-                    <small style='color:#C5A059;'>🤖 SEÑAL AXIOM IA</small>
-                    <h2 style='color:{color}; margin:0;'>{side}</h2>
-                    <p>Probabilidad de Éxito: <b style='color:#00ff88;'>75.0%</b></p>
-                    <div class='analysis-box'><b>ANÁLISIS TÉCNICO:</b><br>{razon}</div>
-                    <hr style='border-color:#1e1e26;'>
-                    <p style='color:#C5A059; font-weight:bold; margin-bottom:0;'>🎯 TAKE PROFIT SUGERIDO</p>
-                    <b style='font-size:32px; color:#ffffff;'>{tp:,.4f}</b>
-                </div>
+                    <h3 style='color:{color}; margin:0;'>{side}</h3>
+                    <div class='analysis-box'><b>ANÁLISIS:</b> {razon}</div>
             """, unsafe_allow_html=True)
             
+            # LÓGICA DE ENTRADA Y TP MOSTRADA SOLO SI HAY SEÑAL
+            if tp is not None:
+                st.markdown(f"""
+                    <div style='display:flex; justify-content:space-between; margin-top:10px;'>
+                        <div class='level-box'>
+                            <small style='color:#a0a0a0;'>NIVEL DE ENTRADA</small><br>
+                            <b style='font-size:18px;'>{last_p:,.4f}</b>
+                        </div>
+                        <div class='level-box' style='border: 1px solid #C5A059;'>
+                            <small style='color:#C5A059;'>TP SUGERIDO</small><br>
+                            <b style='font-size:18px; color:#C5A059;'>{tp:,.4f}</b>
+                        </div>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+            else:
+                st.markdown(f"""
+                    <div style='background:#11111d; padding:10px; border-radius:8px; margin-top:10px;'>
+                        <small style='color:#FFD700;'>ESTADO DE MERCADO</small><br>
+                        <b style='font-size:16px;'>Precio actual ({last_p:,.4f}) en zona de conflicto. Protege tu capital y no operes.</b>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+
             perdida = balance * (risk_pct / 100)
-            st.info(f"🛡️ Ajusta tu lotaje para arriesgar exactamente: **${perdida:,.2f}**")
+            if side != "ESPERAR":
+                st.info(f"🛡️ Ajusta tu lotaje para arriesgar exactamente: **${perdida:,.2f}**")
             
-            st.markdown("<h4 style='color:#C5A059; margin-top:15px;'>📰 Radar de Noticias</h4>", unsafe_allow_html=True)
+            st.markdown("<h5 style='color:#C5A059; margin-top:10px;'>📰 Radar de Noticias</h5>", unsafe_allow_html=True)
             titulares_reales = []
             try:
                 query = urllib.parse.quote(f"{activo_nombre} finanzas")
@@ -203,17 +230,46 @@ with tab_term:
                 for pub, title in titulares_reales:
                     st.markdown(f"<div class='news-box'><b>{pub}</b>: {title}</div>", unsafe_allow_html=True)
             else:
-                st.markdown(f"<div class='news-box'><b>Axiom Analítica</b>: Escaneando flujos de volumen en {activo_nombre}.</div>", unsafe_allow_html=True)
+                st.markdown(f"<div class='news-box'><b>Axiom Analítica</b>: Escaneando flujos en {activo_nombre}.</div>", unsafe_allow_html=True)
 
 with tab_acad:
-    st.markdown("<h3 style='color:#C5A059; text-align:center;'>🎓 Programa Axiom</h3>", unsafe_allow_html=True)
-    n1, n2, n3 = st.tabs(["🟢 Nivel 1", "🟡 Nivel 2", "🔴 Nivel 3"])
+    st.markdown("<h3 style='color:#C5A059; text-align:center;'>🎓 Academia Axiom Completa</h3>", unsafe_allow_html=True)
+    n1, n2, n3 = st.tabs(["🟢 Fundamentos", "🟡 Técnico", "🔴 Axiom TP:1"])
     with n1:
-        st.markdown("""<div class="acad-text"><p><span class="step-highlight">1. ¿Qué es el Trading?</span><br> Ganamos dinero por la diferencia de precio.</p><p><span class="step-highlight">2. Conceptos:</span><br>• <b>Balance:</b> Tu dinero real depositado.<br>• <b>Margen:</b> El dinero retenido para operar.</p><p><span class="step-highlight">3. SL y TP:</span><br>• <b>Stop Loss (SL):</b> Cierra si vas perdiendo. NUNCA operes sin SL.<br>• <b>Take Profit (TP):</b> Tu objetivo de ganancias.</p></div>""", unsafe_allow_html=True)
+        st.markdown("""
+        <div class="acad-text">
+            <span class="step-highlight">1. Estructura del Mercado</span>
+            El trading consiste en beneficiarse de la diferencia de precio. No compramos activos físicos, operamos Contratos por Diferencia (CFDs). Si crees que el precio subirá, abres una orden de <b>BUY (Largo)</b>. Si crees que caerá, abres una orden de <b>SELL (Corto)</b>.
+            <span class="step-highlight">2. Conceptos Financieros Clave</span>
+            • <b>Balance:</b> Tu capital total depositado.<br>
+            • <b>Margen Usado:</b> La porción de tu balance que el bróker retiene como garantía para mantener tu operación abierta.<br>
+            • <b>Margen Libre:</b> El dinero restante en tu cuenta para abrir más operaciones o absorber pérdidas temporales flotantes.
+            <span class="step-highlight">3. PIPS y Puntos</span>
+            El precio no se mueve en dólares enteros, se mueve en "Pips" (Percentage in Point). Es el cuarto decimal en las divisas (ej: 1.105<b>4</b>). La ganancia o pérdida depende del número de pips que se mueva el mercado multiplicado por el tamaño de tu lote.
+        </div>
+        """, unsafe_allow_html=True)
     with n2:
-        st.markdown("""<div class="acad-text"><p><span class="step-highlight">1. Velas Japonesas:</span><br> El cuerpo nos dice quién tiene el control y las mechas muestran el rechazo.</p><p><span class="step-highlight">2. Tendencias:</span><br>• <b>Alcista:</b> Máximos y mínimos más altos.<br>• <b>Bajista:</b> Máximos y mínimos más bajos.</p><p><span class="step-highlight">3. Soportes y Resistencias:</span><br> Zonas donde el precio rebota por acumulación de órdenes.</p></div>""", unsafe_allow_html=True)
+        st.markdown("""
+        <div class="acad-text">
+            <span class="step-highlight">1. Lectura de Velas Japonesas</span>
+            Las velas muestran la batalla entre compradores y vendedores. El <b>cuerpo</b> indica quién dominó la sesión. Las <b>mechas</b> (sombras) son vitales: representan rechazo del precio. Una mecha larga por debajo del cuerpo indica que los vendedores intentaron bajar el precio pero los compradores ganaron fuerza.
+            <span class="step-highlight">2. Medias Móviles (SMA y EMA)</span>
+            Las medias suavizan el precio para identificar la tendencia. La <b>SMA20</b> (Media Simple) nos da la tendencia a corto plazo. La <b>EMA50</b> (Media Exponencial) reacciona más rápido a los cambios recientes. Cuando el precio está por encima de ambas, buscamos compras; por debajo, ventas. Si el precio está enredado entre ellas, el mercado está lateralizado (sucio).
+            <span class="step-highlight">3. Soportes, Resistencias y Liquidez</span>
+            El mercado no se mueve al azar. Los Soportes (suelos) y Resistencias (techos) son zonas donde los bancos y grandes instituciones acumulan órdenes. Estas zonas actúan como imanes para el precio, creando lo que llamamos "Zonas de Liquidez".
+        </div>
+        """, unsafe_allow_html=True)
     with n3:
-        st.markdown("""<div class="acad-text"><p><span class="step-highlight">1. Gestión de Riesgo:</span><br> Operamos con apalancamiento masivo. El lotaje debe asegurar que si salta el SL, solo pierdas el riesgo de tu balance operativo.</p><p><span class="step-highlight">2. Estrategia TP:1:</span><br> Ejecuta y coloca el TP:1 exactamente en el <b>último máximo</b> o en el <b>último mínimo</b> buscando liquidez.</p><p><span class="step-highlight">3. Psicología:</span><br> Sistema al 75% de Win Rate. Sigue la señal, verifica contexto y respeta tu Stop Loss siempre.</p></div>""", unsafe_allow_html=True)
+        st.markdown("""
+        <div class="acad-text">
+            <span class="step-highlight">1. El Poder del Apalancamiento Masivo</span>
+            En Axiom trabajamos con apalancamientos institucionales de 1:100 o 1:500. Esto multiplica tu poder adquisitivo, permitiéndote abrir lotes grandes con muy poco margen. <b>Advertencia estricta:</b> Un gran apalancamiento requiere un Stop Loss innegociable. El lotaje debe calcularse para que, si la operación falla, solo pierdas un 1% o 2% de tu cuenta.
+            <span class="step-highlight">2. La Regla de Oro: TP:1</span>
+            Esta es la clave para mantener un Win Rate estadístico del 75%. No buscamos que la operación corra eternamente. Tu orden debe cerrarse (Take Profit) en el último máximo relevante (si es compra) o el último mínimo (si es venta). El algoritmo detecta estas zonas porque es ahí donde reposa la liquidez inmediata que el mercado irá a buscar con mayor probabilidad.
+            <span class="step-highlight">3. Psicología del Operador</span>
+            El trading aburrido es el trading rentable. Evita el FOMO (miedo a perderte un movimiento) y el Revenge Trading (operar por rabia tras una pérdida). Si el sistema dicta "ESPERAR", no operar es, de hecho, una posición activa para proteger tu capital. Confía en el 75%, ejecuta sin emociones.
+        </div>
+        """, unsafe_allow_html=True)
 
 with tab_chat:
     st.markdown("<h3 style='color:#C5A059; text-align:center;'>💬 Asistente Virtual</h3>", unsafe_allow_html=True)
@@ -252,4 +308,4 @@ with tab_chat:
         with st.chat_message("assistant"): st.markdown(respuesta)
         st.session_state.messages.append({"role": "assistant", "content": respuesta})
 
-st.caption(f"Axiom Mobile Terminal v5.5 | {datetime.now().strftime('%H:%M:%S')}")
+st.caption(f"Axiom Mobile Terminal v5.6 | {datetime.now().strftime('%H:%M:%S')}")
